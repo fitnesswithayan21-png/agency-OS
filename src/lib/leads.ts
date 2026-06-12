@@ -102,12 +102,12 @@ export async function listLeads(filters: LeadListFilters = {}): Promise<LeadList
   let query = supabase
     .from('leads')
     .select('*, owner:profiles(id, full_name, email, role, avatar_url)', { count: 'exact' })
-    .order('updated_at', { ascending: false })
+    .order('created_at', { ascending: false })
 
   if (filters.search?.trim()) {
     const pattern = `%${normalizeSearch(filters.search)}%`
     query = query.or(
-      `name.ilike.${pattern},company.ilike.${pattern},email.ilike.${pattern},source.ilike.${pattern},industry.ilike.${pattern}`
+      `name.ilike.${pattern},company.ilike.${pattern},email.ilike.${pattern}`
     )
   }
 
