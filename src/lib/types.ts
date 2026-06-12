@@ -275,3 +275,9 @@ export interface AutomationRule {
   name: string
   is_enabled: boolean
 }
+
+export interface ProjectMember {
+  project_id: string
+  profile_id: string
+  role_in_project: string
+}

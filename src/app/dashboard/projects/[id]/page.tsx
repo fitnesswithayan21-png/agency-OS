@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getProjectQuery } from '@/app/dashboard/projects/queries'
+import { getProjectMembersQuery, getTeamQuery } from '@/app/dashboard/team/queries'
+import { AssignMemberForm } from './assign-member-form'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -18,7 +20,11 @@ function formatStage(stage: string) {
 
 export default async function ProjectDetailPage({ params }: PageProps) {
   const resolvedParams = await params
-  const project = await getProjectQuery(resolvedParams.id)
+  const [project, projectMembers, { members: allTeamMembers }] = await Promise.all([
+    getProjectQuery(resolvedParams.id),
+    getProjectMembersQuery(resolvedParams.id),
+    getTeamQuery({ is_suspended: false, limit: 1000 }),
+  ])
 
   if (!project) {
     notFound()
@@ -107,10 +113,11 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               <CardTitle>Team Members</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="py-4 text-center text-muted-foreground">
-                <p>Team management features are under construction.</p>
-                <p className="text-sm mt-2">Assigned members will appear here.</p>
-              </div>
+              <AssignMemberForm 
+                projectId={project.id} 
+                assignedProfiles={projectMembers || []}
+                availableProfiles={allTeamMembers}
+              />
             </CardContent>
           </Card>
         </div>
